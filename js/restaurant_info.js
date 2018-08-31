@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 
 /**
- * Initialize leaflet map
+ * Initialize Mapbox map
  */
 initMap = () => {
   fetchRestaurantFromURL((error, restaurant) => {
@@ -22,7 +22,7 @@ initMap = () => {
         scrollWheelZoom: false
       });
       L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
-        mapboxToken: '<your MAPBOX API KEY HERE>',
+        mapboxToken: 'pk.eyJ1IjoieW91c3NlZjMiLCJhIjoiY2prZGpoN3E3MzdjOTNwbWViN2xsdGpsaCJ9.l9xuJifHIgE_fukelRTn0w',
         maxZoom: 18,
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
           '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -35,22 +35,6 @@ initMap = () => {
   });
 }  
  
-/* window.initMap = () => {
-  fetchRestaurantFromURL((error, restaurant) => {
-    if (error) { // Got an error!
-      console.error(error);
-    } else {
-      self.map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 16,
-        center: restaurant.latlng,
-        scrollwheel: false
-      });
-      fillBreadcrumb();
-      DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
-    }
-  });
-} */
-
 /**
  * Get current restaurant from page URL.
  */
@@ -87,7 +71,8 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   address.innerHTML = restaurant.address;
 
   const image = document.getElementById('restaurant-img');
-  image.className = 'restaurant-img'
+  image.className = 'restaurant-img';
+  image.alt = restaurant.image;
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
 
   const cuisine = document.getElementById('restaurant-cuisine');
@@ -191,4 +176,23 @@ getParameterByName = (name, url) => {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+/* Service Worker */
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+    .then((reg) => {
+    if (reg.installing) {
+      console.log('service worker installing');
+    } else if (reg.installed) { 
+      console.log('service worker installed');
+    } else if (reg.active) {
+      console.log('service worker active');
+    }
+  
+    console.log('Registeration Succeeded. Scope is ' + reg.Scope);
+  }).catch((error) => {
+    console.log('Registeration Failed ' + error)
+  })
 }

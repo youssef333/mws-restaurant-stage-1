@@ -69,7 +69,7 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
 }
 
 /**
- * Initialize leaflet map, called from HTML.
+ * Initialize Mapbox map, called from HTML.
  */
 initMap = () => {
   self.newMap = L.map('map', {
@@ -78,7 +78,7 @@ initMap = () => {
         scrollWheelZoom: false
       });
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
-    mapboxToken: '<your MAPBOX API KEY HERE>',
+    mapboxToken: 'pk.eyJ1IjoieW91c3NlZjMiLCJhIjoiY2prZGpoN3E3MzdjOTNwbWViN2xsdGpsaCJ9.l9xuJifHIgE_fukelRTn0w',
     maxZoom: 18,
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
       '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -88,18 +88,6 @@ initMap = () => {
 
   updateRestaurants();
 }
-/* window.initMap = () => {
-  let loc = {
-    lat: 40.722216,
-    lng: -73.987501
-  };
-  self.map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 12,
-    center: loc,
-    scrollwheel: false
-  });
-  updateRestaurants();
-} */
 
 /**
  * Update page and map for current restaurants.
@@ -160,10 +148,11 @@ createRestaurantHTML = (restaurant) => {
 
   const image = document.createElement('img');
   image.className = 'restaurant-img';
+  image.alt = restaurant.image;
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
   li.append(image);
 
-  const name = document.createElement('h1');
+  const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
   li.append(name);
 
@@ -198,14 +187,23 @@ addMarkersToMap = (restaurants = self.restaurants) => {
   });
 
 } 
-/* addMarkersToMap = (restaurants = self.restaurants) => {
-  restaurants.forEach(restaurant => {
-    // Add marker to the map
-    const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
-    google.maps.event.addListener(marker, 'click', () => {
-      window.location.href = marker.url
-    });
-    self.markers.push(marker);
-  });
-} */
 
+
+/* Service Worker */
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+    .then((reg) => {
+    if (reg.installing) {
+      console.log('service worker installing');
+    } else if (reg.installed) { 
+      console.log('service worker installed');
+    } else if (reg.active) {
+      console.log('service worker active');
+    }
+  
+    console.log('Registeration Succeeded. Scope is ' + reg.Scope);
+  }).catch((error) => {
+    console.log('Registeration Failed ' + error)
+  })
+}
